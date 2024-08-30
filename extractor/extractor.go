@@ -11,20 +11,18 @@ type JsonMaster interface {
 }
 
 type JsonBoy struct {
-	isComplete bool
-	stack      stack.Stack[byte]
-	initCap    int
-	jsonStart  int
-	jsonEnd    int
+	stack     stack.Stack[byte]
+	initCap   int
+	jsonStart int
+	jsonEnd   int
 }
 
 func New() *JsonBoy {
 	return &JsonBoy{
-		isComplete: true,
-		stack:      stack.New[byte](),
-		initCap:    0,
-		jsonStart:  -1,
-		jsonEnd:    -1,
+		stack:     stack.New[byte](),
+		initCap:   0,
+		jsonStart: -1,
+		jsonEnd:   -1,
 	}
 }
 
@@ -51,6 +49,7 @@ func (j JsonBoy) hasJson(s string) bool {
 
 func (j JsonBoy) getJson(s string) []string {
 	jsons := make([]string, 0)
+	// TODO: how to record the json efficiently
 	for _, char := range s {
 		switch char {
 		case '{':
@@ -73,18 +72,6 @@ func (j JsonBoy) getJson(s string) []string {
 					j.reset()
 				}
 			}
-		case '[':
-			{
-				// TODO
-			}
-		case ']':
-			{
-				// TODO
-			}
-		case ':':
-			{
-				// TODO
-			}
 		}
 	}
 
@@ -93,10 +80,9 @@ func (j JsonBoy) getJson(s string) []string {
 
 func (j JsonBoy) reset() {
 	j = JsonBoy{
-		isComplete: true,
-		stack:      stack.New[byte](),
-		initCap:    0,
-		jsonStart:  -1,
-		jsonEnd:    -1,
+		stack:     stack.New[byte](),
+		initCap:   0,
+		jsonStart: -1,
+		jsonEnd:   -1,
 	}
 }
