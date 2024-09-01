@@ -14,7 +14,6 @@ type JsonBoy struct {
 	stack     stack.Stack[byte]
 	initCap   int
 	jsonStart int
-	jsonEnd   int
 }
 
 func New() *JsonBoy {
@@ -22,11 +21,10 @@ func New() *JsonBoy {
 		stack:     stack.New[byte](),
 		initCap:   0,
 		jsonStart: -1,
-		jsonEnd:   -1,
 	}
 }
 
-func (j JsonBoy) hasJson(s string) bool {
+func (j JsonBoy) HasJson(s string) bool {
 	// MVP version: only detect braces: { and }
 	for _, char := range s {
 		switch char {
@@ -47,34 +45,31 @@ func (j JsonBoy) hasJson(s string) bool {
 	return j.stack.IsEmpty()
 }
 
-func (j JsonBoy) getJson(s string) []string {
+func (j JsonBoy) GetJson(s string) []string {
 	jsons := make([]string, 0)
-	// TODO: how to record the json efficiently
-	for _, char := range s {
-		switch char {
+	for i, v := range s {
+		switch v {
 		case '{':
 			{
+				if j.stack.IsEmpty() {
+					j.jsonStart = i
+				}
 				j.stack.Push('{')
 			}
 		case '}':
 			{
-				if j.stack.IsEmpty() || j.stack.Top() != '}' {
+				if j.stack.IsEmpty() || j.stack.Top() != '{' {
 					j.reset()
-				}
-			}
-		case '"':
-			{
-				if j.stack.IsEmpty() || j.stack.Top() == '"' {
-					j.stack.Pop()
-				} else if j.stack.Top() == '{' {
-					j.stack.Push('"')
 				} else {
-					j.reset()
+					j.stack.Pop()
+					if j.stack.IsEmpty() {
+						jsons = append(jsons, s[j.jsonStart:i+1])
+						j.reset()
+					}
 				}
 			}
 		}
 	}
-
 	return jsons
 }
 
@@ -83,6 +78,5 @@ func (j JsonBoy) reset() {
 		stack:     stack.New[byte](),
 		initCap:   0,
 		jsonStart: -1,
-		jsonEnd:   -1,
 	}
 }
